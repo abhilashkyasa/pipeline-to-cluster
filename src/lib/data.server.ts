@@ -50,7 +50,7 @@ const demoDaily: DailyStat[] = Array.from({ length: 14 }, (_, i) => {
 type PgPool = { query: (q: string, v?: unknown[]) => Promise<{ rows: any[] }> };
 let pool: PgPool | null = null;
 async function db(): Promise<PgPool | null> {
-  const url = process.env.DATABASE_URL;
+  const url = process.env["DATABASE_URL"];
   if (!url) return null;
   if (!pool) {
     const pg = await import("pg");
@@ -62,7 +62,7 @@ async function db(): Promise<PgPool | null> {
 
 // ---------- sessions (HMAC-signed cookie) ----------
 const COOKIE = "si_session";
-const secret = () => process.env.SESSION_SECRET || "dev-only-secret-change-me";
+const secret = () => process.env["SESSION_SECRET"] || "dev-only-secret-change-me";
 
 async function sign(value: string) {
   const key = await crypto.subtle.importKey(
