@@ -1,24 +1,71 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { getMe, login } from "@/lib/api.functions";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  beforeLoad: async () => {
+    const { user } = await getMe();
+    if (user) throw redirect({ to: "/dashboard" });
+  },
+  head: () => ({
+    meta: [
+      { title: "Sign in — SuperIntelligence" },
+      { name: "description", content: "Sign in to the SuperIntelligence delivery platform." },
+      { property: "og:title", content: "Sign in — SuperIntelligence" },
+      { property: "og:description", content: "Pipelines, insights and delivery dashboards." },
+    ],
+  }),
+  component: LoginPage,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function LoginPage() {
+  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      const r = await login({ data: { username, password } });
+      if (r.ok) navigate({ to: "/dashboard" });
+      else setError("Invalid username or password");
+    } catch {
+      setError("Sign in failed, please try again");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <main className="grid-bg flex min-h-screen items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        <div className="mb-10 text-center">
+          <div className="mx-auto mb-5 h-12 w-12 rounded-lg bg-gradient-brand shadow-glow" />
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">Organisation</p>
+          <h1 className="mt-2 text-4xl font-bold tracking-tight text-foreground">SuperIntelligence</h1>
+        </div>
+        <form onSubmit={submit} className="space-y-4 rounded-xl border bg-card p-6 shadow-panel">
+          <div className="space-y-2">
+            <Label htmlFor="u">Username</Label>
+            <Input id="u" value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="p">Password</Label>
+            <Input id="p" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+          </div>
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          <Button type="submit" className="w-full" disabled={busy}>
+            {busy ? "Signing in…" : "Sign in"}
+          </Button>
+        </form>
+      </div>
+    </main>
   );
 }
