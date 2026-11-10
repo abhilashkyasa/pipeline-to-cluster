@@ -100,7 +100,9 @@ export async function verifyLogin(username: string, password: string) {
     );
     ok = r.rows.length > 0;
   } else {
-    ok = username === DEMO_USER.username && password === DEMO_USER.password;
+    ok =
+      (username === DEMO_USER.username && password === DEMO_USER.password) ||
+      demoAccounts.get(username) === password;
   }
   if (!ok) return false;
   const u = encodeURIComponent(username);
@@ -110,6 +112,23 @@ export async function verifyLogin(username: string, password: string) {
     path: "/",
     maxAge: 60 * 60 * 8,
   });
+  return true;
+}
+
+const demoAccounts = new Map<string, string>(); // preview only, resets on restart
+
+export async function createAccount(fullName: string, username: string, password: string) {
+  const p = await db();
+  if (p) {
+    await p.query("alter table app_users add column if not exists full_name text");
+    const r = await p.query(
+      "insert into app_users (username, password_hash, full_name) values ($1, crypt($2, gen_salt('bf')), $3) on conflict (username) do nothing returning id",
+      [username, password, fullName],
+    );
+    return r.rows.length > 0;
+  }
+  if (username === DEMO_USER.username || demoAccounts.has(username)) return false;
+  demoAccounts.set(username, password);
   return true;
 }
 

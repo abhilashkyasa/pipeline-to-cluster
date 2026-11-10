@@ -15,6 +15,24 @@ export const login = createServerFn({ method: "POST" })
     return { ok: await verifyLogin(data.username, data.password) };
   });
 
+export const signup = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        fullName: z.string().trim().min(1).max(100),
+        username: z.string().trim().regex(/^[a-zA-Z0-9._-]{3,40}$/),
+        password: z.string().min(8).max(200),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const { createAccount, verifyLogin } = await import("./data.server");
+    const created = await createAccount(data.fullName, data.username, data.password);
+    if (!created) return { ok: false, error: "That username is already taken" };
+    await verifyLogin(data.username, data.password);
+    return { ok: true, error: "" };
+  });
+
 export const logout = createServerFn({ method: "POST" }).handler(async () => {
   const { clearSession } = await import("./data.server");
   clearSession();

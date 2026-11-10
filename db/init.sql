@@ -3,7 +3,8 @@ create extension if not exists pgcrypto;
 create table if not exists app_users (
   id serial primary key,
   username text unique not null,
-  password_hash text not null
+  password_hash text not null,
+  full_name text
 );
 create table if not exists pipelines (
   id serial primary key, name text not null, status text not null,

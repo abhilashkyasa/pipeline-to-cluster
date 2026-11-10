@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getMe, login } from "@/lib/api.functions";
+import { getMe, login, signup } from "@/lib/api.functions";
 
 export const Route = createFileRoute("/")({
   beforeLoad: async () => {
@@ -23,6 +23,8 @@ export const Route = createFileRoute("/")({
 
 function LoginPage() {
   const navigate = useNavigate();
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -33,11 +35,21 @@ function LoginPage() {
     setBusy(true);
     setError("");
     try {
-      const r = await login({ data: { username, password } });
-      if (r.ok) navigate({ to: "/dashboard" });
-      else setError("Invalid username or password");
-    } catch {
-      setError("Sign in failed, please try again");
+      if (mode === "signup") {
+        if (!fullName.trim()) throw new Error("Please enter your name");
+        if (!/^[a-zA-Z0-9._-]{3,40}$/.test(username.trim()))
+          throw new Error("Username: 3–40 letters, numbers, . _ or -");
+        if (password.length < 8) throw new Error("Password must be at least 8 characters");
+        const r = await signup({ data: { fullName, username, password } });
+        if (r.ok) navigate({ to: "/dashboard" });
+        else setError(r.error);
+      } else {
+        const r = await login({ data: { username, password } });
+        if (r.ok) navigate({ to: "/dashboard" });
+        else setError("Invalid username or password");
+      }
+    } catch (err) {
+      setError(err instanceof Error && !err.message.startsWith("[") ? err.message : "Something went wrong, please try again");
     } finally {
       setBusy(false);
     }
@@ -52,6 +64,12 @@ function LoginPage() {
           <h1 className="mt-2 text-4xl font-bold tracking-tight text-foreground">SuperIntelligence</h1>
         </div>
         <form onSubmit={submit} className="space-y-4 rounded-xl border bg-card p-6 shadow-panel">
+          {mode === "signup" && (
+            <div className="space-y-2">
+              <Label htmlFor="n">Full name</Label>
+              <Input id="n" value={fullName} onChange={(e) => setFullName(e.target.value)} autoComplete="name" maxLength={100} />
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="u">Username</Label>
             <Input id="u" value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" />
@@ -62,8 +80,15 @@ function LoginPage() {
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={busy}>
-            {busy ? "Signing in…" : "Sign in"}
+            {busy ? "Please wait…" : mode === "signup" ? "Create account" : "Sign in"}
           </Button>
+          <button
+            type="button"
+            className="w-full text-sm text-muted-foreground hover:text-foreground"
+            onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(""); }}
+          >
+            {mode === "signin" ? "New here? Create an account" : "Already have an account? Sign in"}
+          </button>
         </form>
       </div>
     </main>
