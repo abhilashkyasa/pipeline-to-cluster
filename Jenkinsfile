@@ -42,6 +42,27 @@ pipeline {
                 '''
             }
         }
+        stage('Commit and Push Manifest') {
+    steps {
+        withCredentials([
+            usernamePassword(
+                credentialsId: 'github-push',
+                usernameVariable: 'GIT_USERNAME',
+                passwordVariable: 'GIT_TOKEN'
+            )
+        ]) {
+            sh '''
+                git config user.email "jenkins@local"
+                git config user.name "Jenkins"
+
+                git add k8s/app.yaml
+                git commit -m "ci: update image to $IMAGE_TAG" || echo "No changes to commit"
+
+                git push https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/abhilashkyasa/pipeline-to-cluster.git HEAD:main
+            '''
+        }
+    }
+}
 
         stage('Verify Kubernetes') {
             steps {
