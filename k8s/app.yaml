@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: si-app
-          image: pipeline-to-cluster:7
+          image: pipeline-to-cluster:8
           imagePullPolicy: IfNotPresent
           ports: [{ containerPort: 3000 }]
           envFrom: [{ secretRef: { name: si-secrets } }]
