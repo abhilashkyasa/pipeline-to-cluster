@@ -10,7 +10,10 @@ export const Route = createFileRoute("/_app/insights")({
       { title: "Insights — SuperIntelligence" },
       { name: "description", content: "Delivery performance insights for SuperIntelligence." },
       { property: "og:title", content: "Insights — SuperIntelligence" },
-      { property: "og:description", content: "Delivery performance insights for SuperIntelligence." },
+      {
+        property: "og:description",
+        content: "Delivery performance insights for SuperIntelligence.",
+      },
     ],
   }),
   component: Insights,
@@ -31,8 +34,11 @@ function Insights() {
               <p className="mt-3 font-mono text-4xl font-semibold">
                 {i.value} <span className="text-base text-muted-foreground">{i.metric}</span>
               </p>
-              <p className={`mt-3 flex items-center gap-1 text-sm ${up ? "text-success" : "text-warning"}`}>
-                <Icon className="h-4 w-4" /> {up ? "+" : ""}{i.trend}% vs last period
+              <p
+                className={`mt-3 flex items-center gap-1 text-sm ${up ? "text-success" : "text-warning"}`}
+              >
+                <Icon className="h-4 w-4" /> {up ? "+" : ""}
+                {i.trend}% vs last period
               </p>
             </div>
           );

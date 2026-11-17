@@ -37,10 +37,18 @@ function Pipelines() {
                 <td className="px-4 py-3 font-medium">{p.name}</td>
                 <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{p.branch}</td>
                 <td className="px-4 py-3">
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusClass[p.status]}`}>{p.status}</span>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusClass[p.status]}`}
+                  >
+                    {p.status}
+                  </span>
                 </td>
-                <td className="px-4 py-3 font-mono">{Math.floor(p.duration_sec / 60)}m {p.duration_sec % 60}s</td>
-                <td className="px-4 py-3 text-muted-foreground">{new Date(p.last_run).toLocaleString()}</td>
+                <td className="px-4 py-3 font-mono">
+                  {Math.floor(p.duration_sec / 60)}m {p.duration_sec % 60}s
+                </td>
+                <td className="px-4 py-3 text-muted-foreground">
+                  {new Date(p.last_run).toLocaleString()}
+                </td>
               </tr>
             ))}
           </tbody>

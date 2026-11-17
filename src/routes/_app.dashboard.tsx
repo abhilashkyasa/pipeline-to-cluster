@@ -1,6 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { dashboardQuery } from "@/lib/dashboard-query";
 
 export const Route = createFileRoute("/_app/dashboard")({
@@ -16,7 +26,9 @@ export const Route = createFileRoute("/_app/dashboard")({
   component: Dashboard,
 });
 
-const tip = { contentStyle: { background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 } };
+const tip = {
+  contentStyle: { background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 },
+};
 
 function Dashboard() {
   const { data } = useSuspenseQuery(dashboardQuery);
@@ -54,8 +66,18 @@ function Dashboard() {
               <XAxis dataKey="day" stroke="var(--muted-foreground)" fontSize={11} />
               <YAxis stroke="var(--muted-foreground)" fontSize={11} />
               <Tooltip {...tip} />
-              <Area dataKey="builds" stroke="var(--chart-1)" fill="var(--chart-1)" fillOpacity={0.2} />
-              <Area dataKey="failures" stroke="var(--chart-3)" fill="var(--chart-3)" fillOpacity={0.3} />
+              <Area
+                dataKey="builds"
+                stroke="var(--chart-1)"
+                fill="var(--chart-1)"
+                fillOpacity={0.2}
+              />
+              <Area
+                dataKey="failures"
+                stroke="var(--chart-3)"
+                fill="var(--chart-3)"
+                fillOpacity={0.3}
+              />
             </AreaChart>
           </ResponsiveContainer>
         </div>

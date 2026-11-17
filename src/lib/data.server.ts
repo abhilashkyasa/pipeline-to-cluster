@@ -47,6 +47,7 @@ const demoDaily: DailyStat[] = Array.from({ length: 14 }, (_, i) => {
   };
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PgPool = { query: (q: string, v?: unknown[]) => Promise<{ rows: any[] }> };
 let pool: PgPool | null = null;
 async function db(): Promise<PgPool | null> {
@@ -54,7 +55,9 @@ async function db(): Promise<PgPool | null> {
   if (!url) return null;
   if (!pool) {
     const pg = await import("pg");
-    const Pool = (pg as any).Pool ?? (pg as any).default.Pool;
+    type PoolCtor = new (cfg: { connectionString: string; max: number }) => PgPool;
+    const pgMod = pg as unknown as { Pool?: PoolCtor; default: { Pool: PoolCtor } };
+    const Pool = pgMod.Pool ?? pgMod.default.Pool;
     pool = new Pool({ connectionString: url, max: 5 });
   }
   return pool;
@@ -148,7 +151,9 @@ export async function loadPipelines(): Promise<Pipeline[]> {
 export async function loadInsights(): Promise<Insight[]> {
   const p = await db();
   if (!p) return demoInsights;
-  const r = await p.query("select id, title, metric, value::float, trend::float from insights order by id");
+  const r = await p.query(
+    "select id, title, metric, value::float, trend::float from insights order by id",
+  );
   return r.rows;
 }
 export async function loadDaily(): Promise<DailyStat[]> {

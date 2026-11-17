@@ -8,7 +8,9 @@ export const getMe = createServerFn({ method: "GET" }).handler(async () => {
 
 export const login = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
-    z.object({ username: z.string().min(1).max(100), password: z.string().min(1).max(200) }).parse(d),
+    z
+      .object({ username: z.string().min(1).max(100), password: z.string().min(1).max(200) })
+      .parse(d),
   )
   .handler(async ({ data }) => {
     const { verifyLogin } = await import("./data.server");
@@ -20,7 +22,10 @@ export const signup = createServerFn({ method: "POST" })
     z
       .object({
         fullName: z.string().trim().min(1).max(100),
-        username: z.string().trim().regex(/^[a-zA-Z0-9._-]{3,40}$/),
+        username: z
+          .string()
+          .trim()
+          .regex(/^[a-zA-Z0-9._-]{3,40}$/),
         password: z.string().min(8).max(200),
       })
       .parse(d),

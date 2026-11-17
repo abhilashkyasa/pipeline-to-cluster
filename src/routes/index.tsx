@@ -49,7 +49,11 @@ function LoginPage() {
         else setError("Invalid username or password");
       }
     } catch (err) {
-      setError(err instanceof Error && !err.message.startsWith("[") ? err.message : "Something went wrong, please try again");
+      setError(
+        err instanceof Error && !err.message.startsWith("[")
+          ? err.message
+          : "Something went wrong, please try again",
+      );
     } finally {
       setBusy(false);
     }
@@ -60,23 +64,44 @@ function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-10 text-center">
           <div className="mx-auto mb-5 h-12 w-12 rounded-lg bg-gradient-brand shadow-glow" />
-          <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">Organisation</p>
-          <h1 className="mt-2 text-4xl font-bold tracking-tight text-foreground">SuperIntelligence</h1>
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
+            Organisation
+          </p>
+          <h1 className="mt-2 text-4xl font-bold tracking-tight text-foreground">
+            SuperIntelligence
+          </h1>
         </div>
         <form onSubmit={submit} className="space-y-4 rounded-xl border bg-card p-6 shadow-panel">
           {mode === "signup" && (
             <div className="space-y-2">
               <Label htmlFor="n">Full name</Label>
-              <Input id="n" value={fullName} onChange={(e) => setFullName(e.target.value)} autoComplete="name" maxLength={100} />
+              <Input
+                id="n"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                autoComplete="name"
+                maxLength={100}
+              />
             </div>
           )}
           <div className="space-y-2">
             <Label htmlFor="u">Username</Label>
-            <Input id="u" value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" />
+            <Input
+              id="u"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoComplete="username"
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="p">Password</Label>
-            <Input id="p" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+            <Input
+              id="p"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+            />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={busy}>
@@ -85,7 +110,10 @@ function LoginPage() {
           <button
             type="button"
             className="w-full text-sm text-muted-foreground hover:text-foreground"
-            onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(""); }}
+            onClick={() => {
+              setMode(mode === "signin" ? "signup" : "signin");
+              setError("");
+            }}
           >
             {mode === "signin" ? "New here? Create an account" : "Already have an account? Sign in"}
           </button>
